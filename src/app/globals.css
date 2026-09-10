@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* --- The Canvas --- */
+    /* Deepest black from the image background */
+    --background: #02040A; 
+    /* Dark, cold navy from the hoodie fabric for our cards/navbar */
+    --surface: #0B1221;    
+    /* Slightly lighter navy for hover states on buttons or chat bubbles */
+    --surface-hover: #152036; 
+
+    /* --- The Brand (Electric Blue) --- */
+    /* The core blue from the glowing mask */
+    --primary: #0066FF;       
+    /* The brightest white-hot center of the glow for hover states */
+    --primary-glow: #4DFFFF;  
+    
+    /* --- Typography --- */
+    /* Icy off-white for primary text (never use pure white #FFF on pure black) */
+    --text-main: #E2E8F0;     
+    /* Muted blue-gray for timestamps, secondary text, and inactive icons */
+    --text-muted: #64748B;    
+
+    /* --- UI Elements --- */
+    /* Subtle borders to separate dark elements */
+    --border: #1E293B;        
+    /* A sharp red for destructive actions (like blocking a user) */
+    --destructive: #EF4444;   
+  }
+
+  /* Applies the base colors to the whole HTML document instantly */
+  body {
+    background-color: var(--background);
+    color: var(--text-main);
+  }
+}
