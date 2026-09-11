@@ -29,7 +29,7 @@ export default function SearchResult({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-6">
+    <div className="flex flex-col items-center justify-center gap-4">
       <div className="text-center flex flex-col gap-1">
         <h3 className="text-text-main text-3xl font-semibold tracking-wide">
           {user.fullName}
