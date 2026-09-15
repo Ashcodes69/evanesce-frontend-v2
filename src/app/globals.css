@@ -17,8 +17,30 @@
 
 @layer base {
   body {
-    /* Tailwind v4 exposes the variables automatically with the prefix intact */
     background-color: var(--color-background);
     color: var(--color-text-main);
+  }
+  
+  /* --- The Scrollbar Fix --- */
+  /* For Chrome, Edge, and Safari */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    /* Fixed variable names below */
+    background: var(--color-border); 
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
   }
 }
