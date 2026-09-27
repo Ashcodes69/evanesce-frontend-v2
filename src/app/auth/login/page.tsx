@@ -1,19 +1,51 @@
 "use client";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, ReactNode } from "react";
 import Link from "next/link";
 import AuthLayout from "@/src/components/layout/AuthLayout";
 import Input from "@/src/components/ui/Input";
 import Button from "@/src/components/ui/Button";
+
+import { useRouter } from "next/navigation";
+import { useAlert } from "@/src/contexts/AlertContext";
+import { api } from "@/src/services/api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: FormEvent) => {
+  const router = useRouter();
+  const { showAlert } = useAlert();
+
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!username || !password) {
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1500);
+
+    const formData = new URLSearchParams();
+    formData.append("username", username);
+    formData.append("password", password);
+    try {
+      const res = await api.post("login", formData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+
+      const token = await res.data.access_token;
+      localStorage.setItem("token", token);
+
+      window.dispatchEvent(new Event("auth-changed"));
+      router.push("/");
+    } catch (err: any) {
+      const detail =
+        err.response?.data?.detail || "invalid username or password";
+      showAlert(typeof detail === "string" ? detail : "login failed", false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const footer = (
