@@ -1,64 +1,48 @@
-"use client";
-import Button from "@/src/components/ui/Button";
+import  Button  from "@/src/components/ui/Button";
 
-export interface ConnectionRequest {
-  id: string;
-  fullName: string;
-  username: string;
+interface RequestItem {
+  connection_id: number;
+  sender_id: number;
+  sender_username: string;
 }
 
-interface IncommingRequestProps {
-  requests: ConnectionRequest[];
-  onAccept: (id: string) => void;
-  onDecline: (id: string) => void;
+interface IncomingRequestsProps {
+  requests: RequestItem[];
+  onAccept: (connectionId: number, userId: number) => void;
+  onDecline: (connectionId: number) => void;
+  actionLoadingId: number | null;
 }
 
-export default function IncomingRequests({
-  requests,
-  onAccept,
-  onDecline,
-}: IncommingRequestProps) {
-  if (requests.length == 0) {
-    return (
-      <div className="text-center py-8 border border-dashed rounded-lg bg-surface/50">
-        <p className="text-text-muted text-sm">No new requests</p>
-      </div>
-    );
+export default function IncomingRequests({ requests, onAccept, onDecline, actionLoadingId }: IncomingRequestsProps) {
+  if (requests.length === 0) {
+    return <p className="text-text-muted text-sm text-center py-4">No new chat requests.</p>;
   }
 
   return (
-    <ul className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       {requests.map((req) => (
-        <li
-          key={req.id}
-          className="flex items-center justify-between p-4 bg-surface border border-border rounded-xl transition-all hover:border-text-muted/30"
-        >
-          <div className="flex flex-col">
-            <span className="text-text-main font-semibold tracking-wide">
-              {req.fullName}
-            </span>
-            <span className="text-text-muted text-sm">@{req.username}</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
-              className="px-4 py-1.5 text-sm"
-              onClick={() => onAccept?.(req.id)}
-            >
-              Accept
-            </Button>
-
-            <Button
-              variant="destructive"
-              className="px-4 py-1.5 text-sm"
-              onClick={() => onDecline?.(req.id)}
+        <div key={req.connection_id} className="flex items-center justify-between p-4 rounded-xl bg-surface border border-border">
+          <span className="text-text-main font-medium">@{req.sender_username}</span>
+          <div className="flex gap-2">
+            <Button 
+              variant="destructive" 
+              onClick={() => onDecline(req.connection_id)}
+              disabled={actionLoadingId === req.connection_id}
+              className="px-4 py-1.5 text-xs bg-transparent text-text-muted hover:text-white border border-border"
             >
               Decline
             </Button>
+            <Button 
+              variant="primary" 
+              onClick={() => onAccept(req.connection_id, req.sender_id)}
+              disabled={actionLoadingId === req.connection_id}
+              className="px-4 py-1.5 text-xs"
+            >
+              Accept
+            </Button>
           </div>
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }
