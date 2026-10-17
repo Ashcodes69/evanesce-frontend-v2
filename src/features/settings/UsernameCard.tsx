@@ -1,22 +1,52 @@
 "use client";
+
 import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import Input from "@/src/components/ui/Input";
 import Button from "@/src/components/ui/Button";
+import { api } from "@/src/services/api";
+import { useAlert } from "@/src/contexts/AlertContext";
 
 export default function UsernameCard() {
   const [password, setPassword] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const router = useRouter();
+  const { showAlert, showConfirm } = useAlert();
+
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
-    if (!password || !newUsername.trim()) return;
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      setPassword("");
-      setNewUsername("");
-    }, 1500);
+    if (!password || !newUsername.trim()) {
+      showAlert("Please fill in both fields.", false);
+      return;
+    }
+
+    showConfirm(
+      "Changing your username will log you out. Continue?",
+      async () => {
+        setSaving(true);
+        try {
+          await api.put("/me/username", {
+            password,
+            new_username: newUsername,
+          });
+
+          // Purge session and logout
+          localStorage.removeItem("token");
+          window.dispatchEvent(new Event("auth-changed"));
+
+          showAlert("Username updated. Please log in again.", true);
+          router.push("/auth/login");
+        } catch (err: any) {
+          showAlert(
+            err.response?.data?.detail || "Failed to update username.",
+            false,
+          );
+          setSaving(false);
+        }
+      },
+    );
   };
 
   return (
@@ -39,7 +69,7 @@ export default function UsernameCard() {
           />
           <Input
             type="text"
-            placeholder="e.g. Ashcodes69"
+            placeholder="e.g. agent007"
             value={newUsername}
             onChange={(e) => setNewUsername(e.target.value)}
           />

@@ -10,6 +10,8 @@ import { api } from "@/src/services/api";
 import { useAlert } from "@/src/contexts/AlertContext";
 import { useWebSocketContext } from "@/src/contexts/WebSocketContext";
 
+import { RequestItem } from "@/src/features/connections/IncomingRequests"
+
 interface UserResult {
   id: number;
   username: string;
@@ -17,12 +19,6 @@ interface UserResult {
   connection_status: "none" | "pending_sent" | "pending_received" | "accepted";
 }
 
-interface RequestItem {
-  connection_id: number;
-  sender_id: number;
-  sender_username: string;
-  sender_full_name: string;
-}
 
 export default function Home() {
   const [fullName, setFullName] = useState("");
@@ -52,7 +48,10 @@ export default function Home() {
       .catch(() => {});
     api
       .get("/connections/requests/incoming")
-      .then((res) => setRequests(res.data))
+      .then((res) => {
+        setRequests(res.data);
+        console.log(res.data);
+      })
       .catch(() => {});
   }, []);
 
@@ -80,7 +79,7 @@ export default function Home() {
     try {
       const response = await api.get(`/users/search/${searchQuery}`);
       setUserResult(response.data);
-      console.log(response.data)
+      console.log(response.data);
     } catch (err: any) {
       if (err.response?.status === 404) showAlert("User not found.", false);
       else showAlert("Search failed.", false);

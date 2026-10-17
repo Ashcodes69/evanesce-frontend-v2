@@ -3,13 +3,16 @@ import Link from "next/link";
 import { ChevronLeft, MoreVertical } from "lucide-react";
 
 interface ChatHeaderProps {
-  fullName: string;
+  full_name: string;
+  status: string;
   username: string;
+  lastSeen: string;
+  blocking: boolean;
   onBlock: () => void;
 }
 
 export default function ChatHeader({
-  fullName,
+  full_name,
   username,
   onBlock,
 }: ChatHeaderProps) {
@@ -25,7 +28,7 @@ export default function ChatHeader({
 
         <div className="flex flex-col">
           <h2 className="text-text-main font-semibold text-lg leading-tight">
-            {fullName}
+            {full_name}
           </h2>
           <span className="text-text-muted text-xs">{username}</span>
         </div>
