@@ -1,17 +1,22 @@
-'use client';
+"use client";
 
 import { useRouter } from "next/navigation";
 import Navbar from "@/src/components/layout/Navbar";
 import ProfileNameCard from "@/src/features/settings/ProfileNameCard";
 import UsernameCard from "@/src/features/settings/UsernameCard";
 import ActionCard from "@/src/features/settings/ActionCard";
-import  Button  from "@/src/components/ui/Button";
+import Button from "@/src/components/ui/Button";
 import { useAlert } from "@/src/contexts/AlertContext";
+import { useEffect } from "react";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { showConfirm } = useAlert();
-
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      router.push("/auth/login");
+    }
+  },[]);
   const handleLogout = () => {
     showConfirm("Are you sure you want to log out?", () => {
       localStorage.removeItem("token");
@@ -34,7 +39,7 @@ export default function SettingsPage() {
 
         <ProfileNameCard />
         <UsernameCard />
-        
+
         <ActionCard
           title="Security"
           description="Update your password via email verification."

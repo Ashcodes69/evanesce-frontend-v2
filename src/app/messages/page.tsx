@@ -6,6 +6,7 @@ import Input from "@/src/components/ui/Input";
 import ChatRow from "@/src/features/chat/ChatRow";
 import { api } from "@/src/services/api";
 import { useWebSocketContext } from "@/src/contexts/WebSocketContext";
+import { useRouter } from "next/navigation";
 
 interface RecentChat {
   user_id: number;
@@ -21,10 +22,13 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(true);
 
   const { addListener } = useWebSocketContext();
-
+  const router = useRouter();
   // 1. Initial Data Fetch
   useEffect(() => {
     const fetchRecentChats = async () => {
+      if (!localStorage.getItem("token")) {
+        router.push("/auth/login");
+      }
       try {
         const res = await api.get("/conversations");
         setChats(res.data);

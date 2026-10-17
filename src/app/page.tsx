@@ -50,7 +50,6 @@ export default function Home() {
       .get("/connections/requests/incoming")
       .then((res) => {
         setRequests(res.data);
-        console.log(res.data);
       })
       .catch(() => {});
   }, []);
@@ -79,7 +78,6 @@ export default function Home() {
     try {
       const response = await api.get(`/users/search/${searchQuery}`);
       setUserResult(response.data);
-      console.log(response.data);
     } catch (err: any) {
       if (err.response?.status === 404) showAlert("User not found.", false);
       else showAlert("Search failed.", false);

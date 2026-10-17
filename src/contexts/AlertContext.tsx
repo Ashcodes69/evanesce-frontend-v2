@@ -27,26 +27,24 @@ const AlertContext = createContext<AlertContextType | undefined>(undefined);
 export function AlertProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   
-  // State for the auto-hiding toast notifications
   const [alertState, setAlertState] = useState<AlertState>({
     show: false,
     message: "",
     success: true,
   });
 
-  // State for the blocking confirmation modal[cite: 3]
   const [confirmState, setConfirmState] = useState<ConfirmState>({
     show: false,
     message: "",
   });
 
-  // State for the yellow developer warning banner[cite: 3]
+  // Start true so it drops down on initial load
   const [showDevNotice, setShowDevNotice] = useState(true);
 
   // --- Global Event Listeners ---
   useEffect(() => {
-    // Hide the developer notice after 10 seconds automatically
-    const timer = setTimeout(() => setShowDevNotice(false), 10000);
+    // Hide the developer notice after 7 seconds automatically
+    const timer = setTimeout(() => setShowDevNotice(false), 7000);
     
     // Listen for the Axios interceptor firing a 401 Unauthorized
     const handleAuthChange = () => {
@@ -65,11 +63,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
   // --- Context Methods ---
   const showAlert = useCallback((message: string, success: boolean) => {
     setAlertState({ show: true, message, success });
-    
-    // Auto-dismiss the alert after 3 seconds (Toast behavior)
-    setTimeout(() => {
-      setAlertState((prev) => ({ ...prev, show: false }));
-    }, 3000);
+    setTimeout(() => setAlertState((prev) => ({ ...prev, show: false })), 3000);
   }, []);
 
   const showConfirm = useCallback((message: string, onConfirm: () => void) => {
@@ -81,9 +75,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const handleConfirmAction = useCallback(() => {
-    if (confirmState.onConfirm) {
-      confirmState.onConfirm();
-    }
+    if (confirmState.onConfirm) confirmState.onConfirm();
     closeConfirm();
   }, [confirmState, closeConfirm]);
 
@@ -92,7 +84,10 @@ export function AlertProvider({ children }: { children: ReactNode }) {
       {children}
       
       {/* 1. The Global Developer Notice */}
-      <DeveloperNotice isVisible={showDevNotice} />
+      <DeveloperNotice 
+        isVisible={showDevNotice} 
+        onClose={() => setShowDevNotice(false)} 
+      />
 
       {/* 2. The Blocking Confirmation Dialog */}
       {confirmState.show && (

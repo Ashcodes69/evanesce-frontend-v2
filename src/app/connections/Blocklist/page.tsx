@@ -6,6 +6,7 @@ import Navbar from "@/src/components/layout/Navbar";
 import Button from "@/src/components/ui/Button";
 import { api } from "@/src/services/api";
 import { useAlert } from "@/src/contexts/AlertContext";
+import { useRouter } from "next/navigation";
 
 interface BlockedUser {
   user_id: number;
@@ -19,9 +20,13 @@ export default function BlocklistPage() {
   const [unblockingId, setUnblockingId] = useState<number | null>(null);
 
   const { showAlert, showConfirm } = useAlert();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchBlocklist = async () => {
+      if (!localStorage.getItem("token")) {
+        router.push("/auth/login");
+      }
       try {
         const res = await api.get("/connections/blocked");
         setBlockedUsers(res.data);

@@ -25,16 +25,28 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    if (error.response?.status === 402) {
-      if (typeof window !== undefined) {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      if (typeof window !== "undefined") {
+        // 1. Nukes the token
         localStorage.removeItem("token");
+
+        // 2. Triggers your AlertContext to show the red toast
         window.dispatchEvent(new Event("auth-changed"));
+
+        // 3. Native fallback: If Next.js ignores the router.push, this forces the redirect
+        if (!window.location.pathname.includes("/auth/login")) {
+          setTimeout(() => {
+            window.location.href = "/auth/login";
+          }, 500); // 500ms delay lets the "Session expired" toast render first
+        }
       }
     }
+
     return Promise.reject(error);
   },
 );
