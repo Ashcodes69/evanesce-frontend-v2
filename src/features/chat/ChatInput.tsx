@@ -3,13 +3,16 @@ import { FormEvent, useState } from "react";
 
 import Input from "@/src/components/ui/Input";
 import Button from "@/src/components/ui/Button";
+import FilePickerButton from "@/src/components/ui/FilePickerButton";
 
 import { Send } from "lucide-react";
 
 export default function ChatInput({
   onSendMessage,
+  onAttachFile,
 }: {
   onSendMessage: (message: string) => void;
+  onAttachFile: (file: File) => void;
 }) {
   const [message, setMessage] = useState("");
 
@@ -25,7 +28,8 @@ export default function ChatInput({
       onSubmit={handleSubmit}
       className="flex items-end gap-3 p-4 bg-background border-t border-border"
     >
-        
+      <FilePickerButton onFileSelect={onAttachFile} />
+
       <Input
         type="text"
         value={message}
