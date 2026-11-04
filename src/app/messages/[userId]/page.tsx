@@ -6,6 +6,14 @@ import { useRouter } from "next/navigation";
 import ChatHeader from "@/src/features/chat/ChatHeader";
 import ChatInput from "@/src/features/chat/ChatInput";
 import MessageBubble from "@/src/features/chat/MessageBubble";
+import {
+  encodeFileMessage,
+  FileTransferError,
+  uploadEncryptedFile,
+  parseFileMessage,
+} from "@/src/features/files/fileTransfer";
+
+import FileCard from "@/src/features/files/FileCard";
 
 import { api } from "@/src/services/api";
 import { useAlert } from "@/src/contexts/AlertContext";
@@ -212,6 +220,21 @@ export default function ConversationPage() {
     );
     setNewMessage("");
   };
+  const handleAttachFile = (file: File) => {
+    showConfirm(`Send "${file.name}"?`, async () => {
+      try {
+        const payload = await uploadEncryptedFile(file, parseInt(userId));
+        handleSendMessage(encodeFileMessage(payload));
+      } catch (err) {
+        showAlert(
+          err instanceof FileTransferError
+            ? err.message
+            : "Could not send the file.",
+          false,
+        );
+      }
+    });
+  };
 
   const handleBlockClick = () => {
     showConfirm(
@@ -273,17 +296,29 @@ export default function ConversationPage() {
               </p>
             </div>
           ) : (
-            messages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                content={msg.content}
-                isSender={
-                  msg.sender_id === -1 || msg.sender_id.toString() !== userId
-                }
-                timestamp={msg.created_at}
-                isRemoving={removingIds.has(msg.id)}
-              />
-            ))
+            messages.map((msg) => {
+              const isSender =
+                msg.sender_id === -1 || msg.sender_id.toString() !== userId;
+              const file = parseFileMessage(msg.content);
+
+              return file ? (
+                <FileCard
+                  key={msg.id}
+                  file={file}
+                  isSender={isSender}
+                  timestamp={msg.created_at}
+                  isRemoving={removingIds.has(msg.id)}
+                />
+              ) : (
+                <MessageBubble
+                  key={msg.id}
+                  content={msg.content}
+                  isSender={isSender}
+                  timestamp={msg.created_at}
+                  isRemoving={removingIds.has(msg.id)}
+                />
+              );
+            })
           )}
 
           {isTyping && (
@@ -304,7 +339,10 @@ export default function ConversationPage() {
           <div ref={messagesEndRef} className="h-1" />
         </div>
 
-        <ChatInput onSendMessage={handleSendMessage} />
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          onAttachFile={handleAttachFile}
+        />
       </div>
     </main>
   );
